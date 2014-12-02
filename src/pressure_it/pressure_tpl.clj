@@ -8,7 +8,11 @@
 (defn oa-user-login
   [cs]
   (let [login-url "http://someappurl.cc/Login"]
-    (client/post login-url {:form-params {:fLoginVerification 1
+    (client/get "http://loginpage" {:cookie-store cs})
+    (client/get "http://captcha-url" {:cookie-store cs})
+    (println "please open file log/captcha.xxx, and enter captcha code:")
+    (let [captcha (read-line)]
+      (client/post login-url {:form-params {:fLoginVerification 1
                                           :Username "username"
                                           :Password "password"
                                           :DBPath "/domcfg.nsf"
@@ -16,7 +20,7 @@
                                           :Path_Info_Decoded "/index.nsf"
                                           :SaveOptions 1
                                           :$PublicAccess 1}
-                            :cookie-store cs})))
+                            :cookie-store cs}))))
 
 (def oa-user-request-urls
   ["http://someurl.cc"
