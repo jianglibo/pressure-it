@@ -2,6 +2,8 @@
   (:require [clojure.tools.logging :as log]
             [clojure.string :as cstr]
             [clojure.pprint :as pprint]
+            [clojure.java.shell :as shell]
+            [clojure.java.io :as io]
             [clj-http.client :as client])
   (:import (java.util.concurrent Executors)))
 
@@ -31,7 +33,7 @@
   (let [nurls (map #(cstr/replace % "{{rand}}" (random-str 8)) urls)]
     (doall
      (map (fn [nurl url]
-            (save-response result-atom (try (client/get nurl {:cookie-store cs :socket-timeout 3000 :conn-timeout 3000})
+            (save-response result-atom (try (client/get nurl {:cookie-store cs :socket-timeout 10000 :conn-timeout 10000})
                                          (catch Exception e (condp re-find (.getMessage e)
                                                               #"time out" {:status -100 :request-time 0}
                                                               {:status -1 :request-time 0}
@@ -97,6 +99,20 @@
                          (-> (Thread/currentThread) .getId))
     (dotimes [_ repeat-times]
       (fetch-urls result-atom cs urls))))
+
+
+(defn get-captcha
+  ([cs url ext]
+   (get-captcha cs url ext "c:/windows/system32/mspaint.exe"))
+  ([cs url ext painturl]
+   (let [res (client/get url {:cookie-store cs :as :byte-array})
+         ct (get-in res [:headers "Content-Type"])
+         fnname (str "log/captcha" ext)]
+     (with-open [w (io/output-stream fnname)]
+       (.write w (:body res)))
+     (shell/sh painturl (-> fnname
+                            (io/file)
+                            .getAbsolutePath)))))
 
 (defn benchmark
   "How many user repeat how many times.

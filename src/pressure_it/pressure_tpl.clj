@@ -9,7 +9,7 @@
   [cs]
   (let [login-url "http://someappurl.cc/Login"]
     (client/get "http://loginpage" {:cookie-store cs})
-    (client/get "http://captcha-url" {:cookie-store cs})
+    (pressure-it/get-captcha cs "http://captcha-url" ".jpg" "c:/windows/system32/mspaint.exe")
     (println "please open file log/captcha.xxx, and enter captcha code:")
     (let [captcha (read-line)]
       (client/post login-url {:form-params {:fLoginVerification 1
@@ -27,7 +27,6 @@
    "http://someurl.cc/RndStr={{rand}}"])
 
 (pressure-it/benchmark [oa-user-login oa-user-request-urls 20 5])
-
 
 (comment
  (pressure-it/benchmark [login-method urllist-tovisit howmany-users repeat-times])
