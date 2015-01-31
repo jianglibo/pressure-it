@@ -3,6 +3,7 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :jvm-opts ^:replace ["-Xms1g" "-Xmx1g" "-server" "-XX:+AggressiveOpts" "-XX:+UseFastAccessorMethods"]
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.slf4j/slf4j-log4j12 "1.7.7"]
                  [clj-http "1.0.1"]
